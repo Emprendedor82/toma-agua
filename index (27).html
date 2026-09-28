@@ -1,0 +1,1835 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#FBFDFF">
+<meta name="description" content="Una pequeña pausa para ti durante el día. Un recordatorio amable para tomar agua.">
+<title>Una pausa para ti</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E💧%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@300;400;500;600;700&family=Raleway:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+/* =========================================================
+   1. TOKENS
+   ========================================================= */
+:root{
+  --blue:#0D88CD;
+  --deep:#0D1C9C;
+  --coral:#FD3142;
+  --orange:#FE9116;
+  --violet:#8826E4;
+  --ink:#0B1446;
+  --muted:#6A7396;
+  --soft:#A3AAC6;
+  --line:rgba(13,28,156,.09);
+  --line2:rgba(13,28,156,.16);
+  --bg:#FBFDFF;
+  --card:rgba(255,255,255,.86);
+  --ls:'League Spartan', 'Helvetica Neue', Arial, sans-serif;
+  --rw:'Raleway', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --ease:cubic-bezier(.22,.8,.25,1);
+}
+
+/* =========================================================
+   2. BASE
+   ========================================================= */
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{min-height:100%}
+body{
+  font-family:var(--rw);
+  color:var(--ink);
+  background:var(--bg);
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+  line-height:1.5;
+}
+/* Luz ambiental muy sutil de fondo */
+body::before{
+  content:"";position:fixed;inset:-20%;z-index:-1;pointer-events:none;
+  background:
+    radial-gradient(40% 35% at 20% 15%, rgba(13,136,205,.08), transparent 70%),
+    radial-gradient(35% 30% at 85% 80%, rgba(136,38,228,.05), transparent 70%),
+    radial-gradient(30% 30% at 90% 10%, rgba(254,145,22,.04), transparent 70%);
+}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;-webkit-tap-highlight-color:transparent}
+input,select{font:inherit;color:inherit}
+[hidden]{display:none !important}
+:focus-visible{outline:2px solid var(--blue);outline-offset:3px;border-radius:8px}
+
+/* =========================================================
+   3. BOTONES COMUNES
+   ========================================================= */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:.5em;
+  padding:17px 28px;border-radius:999px;
+  font-family:var(--ls);font-weight:600;font-size:16px;letter-spacing:.07em;
+  transition:transform .18s var(--ease), box-shadow .25s var(--ease), background .25s, opacity .25s;
+}
+.btn:active{transform:scale(.97)}
+.btn-primary{
+  color:#fff;
+  background:linear-gradient(135deg,var(--blue) 0%, #0B5FC0 55%, var(--deep) 100%);
+  box-shadow:0 14px 30px -12px rgba(13,28,156,.55), inset 0 1px 0 rgba(255,255,255,.25);
+}
+.btn-primary:hover{box-shadow:0 18px 36px -12px rgba(13,28,156,.6), inset 0 1px 0 rgba(255,255,255,.25)}
+.btn-primary:disabled{opacity:.45;cursor:default;box-shadow:none}
+.btn-soft{color:var(--deep);background:rgba(13,136,205,.08)}
+.btn-soft:hover{background:rgba(13,136,205,.13)}
+.btn-text{
+  font-family:var(--rw);font-weight:600;font-size:14px;letter-spacing:0;
+  color:var(--muted);padding:10px 14px;border-radius:12px;
+}
+.btn-text:hover{color:var(--deep)}
+.btn-block{width:100%}
+
+/* =========================================================
+   4. ONBOARDING
+   ========================================================= */
+.ob{
+  min-height:100vh;min-height:100dvh;
+  max-width:540px;margin:0 auto;
+  padding:max(32px, env(safe-area-inset-top)) 26px max(32px, env(safe-area-inset-bottom));
+  display:flex;flex-direction:column;
+}
+.ob-progress{display:flex;gap:6px;justify-content:center;margin-bottom:auto;padding-bottom:24px}
+.ob-progress i{width:6px;height:6px;border-radius:99px;background:var(--line2);transition:all .4s var(--ease)}
+.ob-progress i.on{width:22px;background:var(--blue)}
+.ob-step{display:none;flex-direction:column;gap:18px;animation:stepIn .6s var(--ease)}
+.ob-step.active{display:flex}
+@keyframes stepIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.ob-title{
+  font-family:var(--ls);font-weight:600;color:var(--deep);
+  font-size:clamp(30px,7.5vw,42px);line-height:1.05;letter-spacing:-.02em;
+}
+.ob-text{color:var(--muted);font-size:17px;max-width:44ch}
+.ob-small{color:var(--soft);font-size:13px;line-height:1.5}
+.ob-actions{display:flex;flex-direction:column;gap:6px;margin-top:10px}
+.ob-spacer{margin-bottom:auto}
+.ob-hero{position:relative;width:140px;height:140px;margin:0 0 8px}
+.ob-error{color:var(--coral);font-size:14px;min-height:1.2em}
+.ob-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.ob-custom{display:flex;align-items:center;gap:10px;margin-top:4px}
+.ob-custom input{max-width:120px}
+.ob-summary{
+  font-size:15px;color:var(--deep);background:rgba(13,136,205,.07);
+  padding:14px 16px;border-radius:16px;
+}
+
+/* =========================================================
+   5. CAMPOS, CHIPS, INTERRUPTORES
+   ========================================================= */
+.field{display:flex;flex-direction:column;gap:7px}
+.field > span{font-size:13px;font-weight:600;color:var(--muted)}
+.input{
+  width:100%;padding:14px 16px;font-size:17px;
+  border:1px solid var(--line2);border-radius:16px;background:#fff;
+  transition:border-color .2s, box-shadow .2s;
+  -webkit-appearance:none;appearance:none;
+}
+.input:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 4px rgba(13,136,205,.12)}
+.input-big{font-family:var(--ls);font-size:24px;padding:16px 18px}
+select.input{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236A7396' stroke-width='1.6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 16px center;padding-right:40px;
+}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{
+  min-width:46px;height:46px;padding:0 16px;border-radius:999px;
+  border:1px solid var(--line2);background:#fff;
+  font-family:var(--ls);font-weight:500;font-size:16px;color:var(--deep);
+  transition:background .2s, color .2s, border-color .2s, transform .15s;
+}
+.chip:active{transform:scale(.95)}
+.chip.on{background:var(--blue);border-color:var(--blue);color:#fff}
+.chips.days .chip{padding:0;width:46px}
+
+.switch-row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:6px 0}
+.switch-row p{font-size:15px;font-weight:600}
+.switch-row small{display:block;font-weight:400;color:var(--muted);font-size:13px}
+.switch{position:relative;width:52px;height:30px;flex:none}
+.switch input{position:absolute;opacity:0;width:100%;height:100%;margin:0;cursor:pointer;z-index:1}
+.switch span{position:absolute;inset:0;border-radius:99px;background:#DCE1EF;transition:background .25s}
+.switch span::after{
+  content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;
+  background:#fff;box-shadow:0 2px 6px rgba(11,20,70,.2);transition:transform .25s var(--ease);
+}
+.switch input:checked + span{background:var(--blue)}
+.switch input:checked + span::after{transform:translateX(22px)}
+.switch input:focus-visible + span{outline:2px solid var(--blue);outline-offset:3px}
+
+/* =========================================================
+   6. APP PRINCIPAL
+   ========================================================= */
+.app{
+  max-width:1120px;margin:0 auto;
+  min-height:100vh;min-height:100dvh;
+  padding:max(22px, env(safe-area-inset-top)) 22px max(18px, env(safe-area-inset-bottom));
+  display:grid;grid-template-columns:1fr;
+  grid-template-areas:"top" "stage" "side" "foot";
+  align-content:start;
+}
+.top{grid-area:top;display:flex;justify-content:space-between;align-items:flex-start;gap:16px}
+.greet{
+  font-family:var(--ls);font-weight:600;color:var(--deep);
+  font-size:clamp(30px,7vw,46px);line-height:1.05;letter-spacing:-.025em;
+}
+.remain{margin-top:8px;font-size:18px;color:var(--muted)}
+.remain strong{font-family:var(--ls);font-weight:600;color:var(--blue);font-size:1.12em;letter-spacing:-.01em}
+.note{margin-top:8px;font-size:14px;color:var(--muted);font-style:italic}
+.icon-btn{
+  width:46px;height:46px;border-radius:50%;flex:none;font-size:20px;
+  display:grid;place-items:center;background:rgba(255,255,255,.7);
+  border:1px solid var(--line);transition:transform .3s var(--ease), background .2s;
+}
+.icon-btn:hover{transform:rotate(40deg);background:#fff}
+
+/* --- Escenario del vaso --- */
+.stage{
+  grid-area:stage;position:relative;
+  height:min(54vh,470px);min-height:300px;
+  display:flex;align-items:center;justify-content:center;
+  margin:10px 0 4px;
+}
+.glass-svg{height:100%;width:auto;max-width:100%;overflow:visible}
+.toast{
+  position:absolute;top:4%;left:50%;
+  transform:translate(-50%,10px);
+  padding:10px 20px;border-radius:999px;background:#fff;
+  box-shadow:0 12px 30px -14px rgba(13,28,156,.4);
+  font-family:var(--ls);font-weight:500;font-size:17px;color:var(--deep);
+  white-space:nowrap;opacity:0;pointer-events:none;
+  transition:opacity .5s var(--ease), transform .5s var(--ease);
+}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+/* --- Panel lateral --- */
+.side{grid-area:side;display:flex;flex-direction:column;align-items:center;text-align:center}
+.stats{font-size:14px;color:var(--muted);line-height:1.8}
+.stats b{font-weight:600;color:var(--ink)}
+.timer{margin-top:22px;min-height:104px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+.timer-label{font-size:14px;color:var(--muted)}
+.timer-count{
+  font-family:var(--ls);font-weight:400;color:var(--deep);
+  font-size:clamp(52px,13vw,72px);line-height:1;letter-spacing:-.02em;
+  font-variant-numeric:tabular-nums;
+}
+.timer-msg{font-size:16px;color:var(--ink);max-width:32ch}
+.timer-msg.big{font-family:var(--ls);font-size:22px;color:var(--deep);font-weight:500}
+.rest{display:flex;flex-direction:column;align-items:center;gap:14px}
+.rest p{font-family:var(--ls);font-size:22px;color:var(--deep)}
+.drink-btn{margin-top:18px;width:100%;max-width:360px}
+
+/* --- Historial semanal --- */
+.week{display:flex;justify-content:center;gap:4px;margin-top:34px}
+.wd{width:44px;display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 0;border-radius:14px}
+.wd b{font-family:var(--ls);font-weight:500;font-size:13px;color:var(--soft)}
+.wd span{font-size:12px;color:var(--soft);min-height:18px;white-space:nowrap}
+.wd.done span{color:var(--blue);font-size:15px;font-weight:700}
+.wd.part span{color:var(--muted);font-weight:600}
+.wd.today{background:rgba(13,136,205,.07)}
+.wd.today b{color:var(--deep)}
+
+.meta{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:4px 14px;margin-top:14px}
+.streak{font-size:13px;color:var(--muted)}
+.foot{
+  grid-area:foot;text-align:center;
+  font-size:11px;letter-spacing:.04em;color:var(--soft);opacity:.75;
+  padding:26px 0 4px;
+}
+
+@media (min-width:900px){
+  .app{
+    grid-template-columns:1.15fr 1fr;
+    grid-template-areas:"top top" "stage side" "foot foot";
+    column-gap:64px;align-content:center;padding-top:44px;
+  }
+  .stage{height:min(70vh,640px);margin:0}
+  .side{align-self:center}
+}
+
+/* =========================================================
+   7. OVERLAYS (alarma, celebración, ajustes, confirmación)
+   ========================================================= */
+.overlay{
+  position:fixed;inset:0;z-index:60;
+  display:flex;align-items:center;justify-content:center;
+  padding:24px;
+  background:rgba(245,250,255,.78);
+  -webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);
+  opacity:0;visibility:hidden;
+  transition:opacity .55s var(--ease), visibility 0s linear .55s;
+}
+.overlay.show{opacity:1;visibility:visible;transition:opacity .55s var(--ease), visibility 0s}
+.overlay-inner{
+  width:min(100%,440px);text-align:center;
+  display:flex;flex-direction:column;align-items:center;gap:14px;
+  transform:translateY(16px) scale(.98);transition:transform .7s var(--ease);
+}
+.overlay.show .overlay-inner{transform:none}
+
+/* Ondas concéntricas */
+.ripples{position:relative;width:170px;height:170px;margin-bottom:6px}
+.ripples i{
+  position:absolute;inset:0;border-radius:50%;
+  border:1.5px solid var(--blue);opacity:0;
+  animation:ripple 3.6s cubic-bezier(.2,.6,.3,1) infinite;
+}
+.ripples i:nth-child(2){animation-delay:.9s}
+.ripples i:nth-child(3){animation-delay:1.8s}
+.ripples i:nth-child(4){animation-delay:2.7s}
+@keyframes ripple{0%{transform:scale(.25);opacity:.55}100%{transform:scale(1.35);opacity:0}}
+.ripples .drop{
+  position:absolute;left:50%;top:50%;width:56px;height:72px;
+  transform:translate(-50%,-50%);
+  animation:bob 3.2s ease-in-out infinite;
+  filter:drop-shadow(0 10px 16px rgba(13,136,205,.35));
+}
+@keyframes bob{0%,100%{transform:translate(-50%,-54%)}50%{transform:translate(-50%,-46%)}}
+
+.alarm-msg{
+  font-family:var(--ls);font-weight:600;color:var(--deep);
+  font-size:clamp(28px,7vw,38px);line-height:1.1;letter-spacing:-.02em;
+}
+.alarm-sub{color:var(--muted);font-size:15px}
+.alarm-actions{display:flex;flex-direction:column;gap:6px;width:100%;max-width:340px;margin-top:12px}
+
+/* Celebración */
+.celebrate .ripples{width:230px;height:230px}
+.celebrate .ripples i{border-color:rgba(13,136,205,.7);animation-duration:4.2s}
+.fall{position:absolute;left:50%;top:0;width:10px;height:14px;opacity:0;animation:fall 4.2s cubic-bezier(.55,0,.9,.5) infinite}
+.fall:nth-of-type(2){animation-delay:1.05s}
+.fall:nth-of-type(3){animation-delay:2.1s}
+.fall:nth-of-type(4){animation-delay:3.15s}
+@keyframes fall{
+  0%{transform:translate(-50%,-30px);opacity:0}
+  10%{opacity:.9}
+  22%{transform:translate(-50%,calc(50vh - 150px));opacity:.9}
+  24%,100%{transform:translate(-50%,calc(50vh - 150px)) scale(.2);opacity:0}
+}
+.cel-title{font-family:var(--ls);font-weight:600;color:var(--deep);font-size:clamp(34px,9vw,48px);letter-spacing:-.025em;line-height:1}
+.cel-text{font-size:18px;color:var(--ink);max-width:30ch}
+.cel-stats{font-size:14px;color:var(--muted)}
+.cel-extra{
+  margin-top:10px;padding:20px 22px;border-radius:22px;background:var(--card);
+  box-shadow:0 20px 44px -26px rgba(13,28,156,.45);
+  opacity:0;transform:translateY(10px);transition:opacity 1.2s var(--ease), transform 1.2s var(--ease);
+}
+.cel-extra.show{opacity:1;transform:none}
+.cel-extra small{display:block;font-size:13px;color:var(--violet);font-weight:600;margin-bottom:6px}
+.cel-extra p{font-family:var(--ls);font-size:20px;color:var(--deep);line-height:1.25}
+
+/* Micropausa: tarjeta editorial flotante ("Ya que estás aquí…") */
+/* Velo muy sutil detrás: apenas atenúa y desenfoca, nunca bloquea */
+.micro-veil{
+  position:fixed;inset:0;z-index:39;pointer-events:none;
+  background:rgba(246,250,255,.18);
+  -webkit-backdrop-filter:blur(1px);backdrop-filter:blur(1px);
+  opacity:0;transition:opacity .3s ease;
+}
+.micro-veil.show{opacity:1;transition:opacity .45s ease}
+
+.micro{
+  position:fixed;left:50%;top:57%;z-index:40;
+  width:90vw;max-width:540px;
+  padding:34px 34px 30px;border-radius:30px;
+  background:#fff;
+  border:1px solid rgba(13,28,156,.06);
+  box-shadow:
+    0 2px 6px rgba(13,28,156,.05),
+    0 18px 40px -18px rgba(13,28,156,.28),
+    0 44px 90px -40px rgba(13,28,156,.42);
+  text-align:left;overflow:hidden;
+  /* Estado oculto: salida con fade y leve movimiento hacia abajo (300 ms) */
+  opacity:0;visibility:hidden;
+  transform:translate(-50%,calc(-50% + 12px));
+  transition:opacity .3s ease, transform .3s ease, visibility 0s linear .3s;
+}
+.micro.show{
+  opacity:1;visibility:visible;
+  transform:translate(-50%,-50%) scale(1);
+  transition:none;
+  animation:microIn .42s var(--ease) both;
+}
+@keyframes microIn{
+  from{opacity:0;transform:translate(-50%,calc(-50% + 18px)) scale(.96)}
+  to{opacity:1;transform:translate(-50%,-50%) scale(1)}
+}
+.micro small{
+  display:block;font-family:var(--rw);font-size:15px;font-weight:600;
+  color:var(--violet);margin-bottom:14px;padding-right:36px;
+}
+.micro p{
+  font-family:var(--ls);font-weight:500;
+  font-size:clamp(27px,7vw,34px);line-height:1.14;letter-spacing:-.015em;
+  color:var(--ink);text-wrap:balance;
+}
+.micro-close{
+  position:absolute;top:16px;right:16px;width:36px;height:36px;border-radius:50%;
+  display:grid;place-items:center;font-size:15px;line-height:1;color:var(--soft);
+  transition:background .2s, color .2s;
+}
+.micro-close:hover{background:rgba(13,28,156,.05);color:var(--deep)}
+.micro-sign{
+  display:block;text-align:right;margin-top:26px;
+  font-size:11px;letter-spacing:.03em;color:var(--soft);
+}
+/* Barra de tiempo: línea violeta que se consume en 12 s */
+.micro .bar{position:absolute;left:0;right:0;bottom:0;height:3px;background:rgba(136,38,228,.1)}
+.micro .bar i{display:block;height:100%;width:100%;background:#8826E4;transform-origin:left;transform:scaleX(1)}
+.micro.show .bar i{animation:shrink linear forwards;animation-duration:var(--dur,12s)}
+@keyframes shrink{from{transform:scaleX(1)}to{transform:scaleX(0)}}
+
+@media (min-width:900px){
+  /* Desktop: flota en la zona central inferior, entre el vaso y el temporizador */
+  .micro{top:62%;padding:42px 44px 34px}
+}
+
+/* Hoja de ajustes */
+.sheet{align-items:flex-end;padding:0}
+.sheet-panel{
+  width:min(100%,560px);max-height:92vh;max-height:92dvh;overflow:auto;
+  background:#fff;border-radius:28px 28px 0 0;
+  padding:26px 24px calc(24px + env(safe-area-inset-bottom));
+  box-shadow:0 -20px 60px -30px rgba(13,28,156,.35);
+  transform:translateY(40px);transition:transform .6s var(--ease);
+  text-align:left;
+}
+.overlay.show .sheet-panel{transform:none}
+@media (min-width:700px){
+  .sheet{align-items:center;padding:24px}
+  .sheet-panel{border-radius:28px}
+}
+.sheet-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.sheet-head h2{font-family:var(--ls);font-weight:600;font-size:28px;color:var(--deep);letter-spacing:-.02em}
+.close-x{width:40px;height:40px;border-radius:50%;font-size:20px;color:var(--muted);background:rgba(13,28,156,.05)}
+.group{padding:18px 0;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:14px}
+.group:first-of-type{border-top:0;padding-top:4px}
+.group h3{font-family:var(--ls);font-weight:500;font-size:18px;color:var(--deep)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.inline-unit{display:flex;align-items:center;gap:10px}
+.inline-unit .input{max-width:150px}
+.inline-unit span{color:var(--muted)}
+.pers{display:grid;gap:8px}
+.pers label{
+  display:flex;gap:12px;align-items:flex-start;cursor:pointer;
+  padding:14px 16px;border-radius:16px;border:1px solid var(--line2);
+  transition:border-color .2s, background .2s;
+}
+.pers input{margin-top:4px;accent-color:var(--blue)}
+.pers label:has(input:checked){border-color:var(--blue);background:rgba(13,136,205,.05)}
+.pers b{display:block;font-family:var(--ls);font-weight:600;font-size:15px;color:var(--deep)}
+.pers em{font-style:normal;font-size:14px;color:var(--muted)}
+.hint{font-size:13px;color:var(--muted);line-height:1.55}
+.hint.warn{color:var(--coral)}
+.sheet-actions{display:flex;gap:10px;justify-content:flex-end;padding-top:18px;border-top:1px solid var(--line)}
+
+/* Confirmación */
+.confirm-box{
+  background:#fff;border-radius:26px;padding:28px 24px 20px;
+  box-shadow:0 30px 60px -30px rgba(13,28,156,.4);
+}
+.confirm-box h3{font-family:var(--ls);font-weight:600;font-size:24px;color:var(--deep)}
+.confirm-box p{color:var(--muted);font-size:15px}
+.confirm-actions{display:flex;gap:10px;justify-content:center;margin-top:8px;flex-wrap:wrap}
+
+/* Movimiento reducido */
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.2s !important}
+}
+</style>
+</head>
+<body>
+
+<!-- =========================================================
+     SVG compartido: gota
+     ========================================================= -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="dropGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#6FCBF5"/>
+      <stop offset=".55" stop-color="#0D88CD"/>
+      <stop offset="1" stop-color="#0D1C9C"/>
+    </linearGradient>
+    <symbol id="drop" viewBox="0 0 56 72">
+      <path d="M28 2 C28 2 4 30 4 46 A24 24 0 0 0 52 46 C52 30 28 2 28 2 Z" fill="url(#dropGrad)"/>
+      <path d="M16 44 C16 36 21 29 24 25" stroke="rgba(255,255,255,.65)" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+    </symbol>
+  </defs>
+</svg>
+
+<!-- =========================================================
+     ONBOARDING
+     ========================================================= -->
+<section id="onboarding" class="ob" hidden aria-label="Primeros pasos">
+  <div class="ob-progress" id="obProgress"></div>
+
+  <!-- Paso 0: bienvenida -->
+  <div class="ob-step" data-step="0">
+    <div class="ripples ob-hero">
+      <i></i><i></i><i></i>
+      <svg class="drop"><use href="#drop"/></svg>
+    </div>
+    <h1 class="ob-title" id="obWelcome">Vamos a ayudarte a tomar esos 2 litros de agua 💧</h1>
+    <p class="ob-text">Sin presión. Solo pequeñas pausas para ti a lo largo del día.</p>
+    <div class="ob-actions"><button class="btn btn-primary btn-block" data-next>EMPEZAR</button></div>
+  </div>
+
+  <!-- Paso 1: nombre -->
+  <div class="ob-step" data-step="1">
+    <h1 class="ob-title">Primero, ¿cómo te llamas?</h1>
+    <input id="obName" class="input input-big" type="text" maxlength="30" autocomplete="given-name" placeholder="Tu nombre" aria-label="Tu nombre">
+    <p class="ob-error" id="obNameErr"></p>
+    <div class="ob-actions">
+      <button class="btn btn-primary btn-block" id="obNameNext">CONTINUAR</button>
+      <button class="btn btn-text" data-back>Atrás</button>
+    </div>
+  </div>
+
+  <!-- Paso 2: horario -->
+  <div class="ob-step" data-step="2">
+    <h1 class="ob-title" id="obHoursTitle">¿Cómo es tu día, más o menos?</h1>
+    <p class="ob-text">Solo recordaremos dentro de este horario.</p>
+    <div class="ob-row">
+      <label class="field"><span>Empieza a las</span><input id="obStart" class="input" type="time" value="08:00"></label>
+      <label class="field"><span>Termina a las</span><input id="obEnd" class="input" type="time" value="22:00"></label>
+    </div>
+    <p class="ob-error" id="obHoursErr"></p>
+    <div class="ob-actions">
+      <button class="btn btn-primary btn-block" id="obHoursNext">CONTINUAR</button>
+      <button class="btn btn-text" data-back>Atrás</button>
+    </div>
+  </div>
+
+  <!-- Paso 3: días -->
+  <div class="ob-step" data-step="3">
+    <h1 class="ob-title">¿Qué días quieres que te acompañemos?</h1>
+    <p class="ob-text">Los días que no marques, tus pausas descansan.</p>
+    <div class="chips days" id="obDays"></div>
+    <p class="ob-small">Puedes cambiarlo cuando quieras.</p>
+    <div class="ob-actions">
+      <button class="btn btn-primary btn-block" data-next>CONTINUAR</button>
+      <button class="btn btn-text" data-back>Atrás</button>
+    </div>
+  </div>
+
+  <!-- Paso 4: frecuencia -->
+  <div class="ob-step" data-step="4">
+    <h1 class="ob-title" id="obFreqTitle">Si tu día va de 8:00 a 22:00, podríamos recordártelo cada 90 minutos.</h1>
+    <p class="ob-summary" id="obFreqSummary"></p>
+    <div id="obFreqChange" hidden>
+      <div class="chips" id="obFreqChips"></div>
+      <div class="ob-custom" id="obFreqCustomWrap" hidden>
+        <input id="obFreqCustom" class="input" type="number" min="10" max="240" step="5" value="75" aria-label="Minutos personalizados">
+        <span class="ob-text">minutos</span>
+      </div>
+    </div>
+    <p class="ob-small">Es solo una forma sencilla de repartir el agua en tu día, no una recomendación médica.</p>
+    <div class="ob-actions">
+      <button class="btn btn-primary btn-block" id="obFreqOk">ME GUSTA ASÍ</button>
+      <button class="btn btn-text" id="obFreqToggle">Prefiero cambiarlo</button>
+      <button class="btn btn-text" data-back>Atrás</button>
+    </div>
+  </div>
+
+  <!-- Paso 5: avisos -->
+  <div class="ob-step" data-step="5">
+    <h1 class="ob-title">Un último detalle</h1>
+    <p class="ob-text">¿Cómo prefieres que te avisemos cuando llegue tu pausa?</p>
+    <div class="switch-row">
+      <p>🔊 Sonido<small>Un sonido suave, como una gota.</small></p>
+      <label class="switch"><input type="checkbox" id="obSound" checked aria-label="Sonido"><span></span></label>
+    </div>
+    <div class="switch-row">
+      <p>🔔 Notificaciones<small>Para verlo aunque estés en otra pestaña.</small></p>
+      <label class="switch"><input type="checkbox" id="obNotif" aria-label="Notificaciones"><span></span></label>
+    </div>
+    <p class="ob-small" id="obNotifHint">Los avisos funcionan mientras esta página esté abierta. Si el navegador la suspende o el dispositivo está bloqueado, pueden llegar tarde; al volver, todo se recalcula.</p>
+    <div class="ob-actions">
+      <button class="btn btn-primary btn-block" id="obFinish">EMPEZAR MI DÍA</button>
+      <button class="btn btn-text" data-back>Atrás</button>
+    </div>
+  </div>
+</section>
+
+<!-- =========================================================
+     APLICACIÓN PRINCIPAL
+     ========================================================= -->
+<main id="app" class="app" hidden>
+  <header class="top">
+    <div>
+      <h1 class="greet" id="greet">Hola 👋</h1>
+      <p class="remain" id="remainLine"></p>
+      <p class="note" id="note" hidden></p>
+    </div>
+    <button class="icon-btn" id="btnSettings" aria-label="Configuración">⚙️</button>
+  </header>
+
+  <!-- El protagonista: el vaso -->
+  <section class="stage" aria-label="Vaso de agua">
+    <svg class="glass-svg" id="glass" viewBox="0 0 240 340" role="img" aria-labelledby="glassLabel">
+      <title id="glassLabel">Agua restante en el vaso</title>
+      <defs>
+        <clipPath id="glassClip">
+          <path d="M33 22 L207 22 L190.5 290 Q189.5 303 176 303 L64 303 Q50.5 303 49.5 290 Z"/>
+        </clipPath>
+        <linearGradient id="glassBody" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stop-color="#0D88CD" stop-opacity=".07"/>
+          <stop offset=".45" stop-color="#FFFFFF" stop-opacity=".55"/>
+          <stop offset="1" stop-color="#0D88CD" stop-opacity=".09"/>
+        </linearGradient>
+        <linearGradient id="waterFront" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#5EC6F4" stop-opacity=".9"/>
+          <stop offset=".45" stop-color="#0D88CD" stop-opacity=".88"/>
+          <stop offset="1" stop-color="#0D1C9C" stop-opacity=".92"/>
+        </linearGradient>
+        <linearGradient id="waterBack" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#9ADCF8" stop-opacity=".6"/>
+          <stop offset="1" stop-color="#0D88CD" stop-opacity=".35"/>
+        </linearGradient>
+        <radialGradient id="shadowGrad">
+          <stop offset="0" stop-color="#0D1C9C" stop-opacity=".16"/>
+          <stop offset="1" stop-color="#0D1C9C" stop-opacity="0"/>
+        </radialGradient>
+      </defs>
+
+      <!-- Sombra -->
+      <ellipse cx="120" cy="324" rx="96" ry="9" fill="url(#shadowGrad)"/>
+
+      <!-- Cuerpo del vaso -->
+      <path d="M24 14 L216 14 L196.5 300 Q194.5 320 175 320 L65 320 Q45.5 320 43.5 300 Z"
+            fill="url(#glassBody)" stroke="rgba(13,28,156,.16)" stroke-width="1.6" stroke-linejoin="round"/>
+
+      <!-- Agua (recortada al interior) -->
+      <g clip-path="url(#glassClip)">
+        <g id="waterGroup">
+          <path id="waveBack" fill="url(#waterBack)"/>
+          <path id="waveFront" fill="url(#waterFront)"/>
+          <path id="waveLine" fill="none" stroke="rgba(255,255,255,.75)" stroke-width="1.4"/>
+          <g id="bubbles"></g>
+        </g>
+      </g>
+
+      <!-- Marcas de nivel muy sutiles -->
+      <g stroke="rgba(13,28,156,.14)" stroke-width="1.2" stroke-linecap="round">
+        <line x1="200.3" y1="87" x2="191" y2="87"/>
+        <line x1="196.2" y1="154" x2="186.5" y2="154"/>
+        <line x1="192.1" y1="221" x2="182.5" y2="221"/>
+      </g>
+
+      <!-- Reflejos del cristal -->
+      <path d="M38 26 L50 26 L64 282 Q60 290 56 284 Z" fill="#fff" opacity=".42"/>
+      <path d="M200 30 L204 30 L190 270 L188 268 Z" fill="#fff" opacity=".35"/>
+      <!-- Borde superior -->
+      <ellipse cx="120" cy="14" rx="96" ry="3.2" fill="none" stroke="rgba(13,28,156,.18)" stroke-width="1.4"/>
+      <!-- Base gruesa -->
+      <path d="M50 304 Q52 316 66 316 L174 316 Q188 316 190 304" fill="none" stroke="rgba(255,255,255,.8)" stroke-width="2"/>
+    </svg>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  </section>
+
+  <section class="side">
+    <p class="stats" id="stats"></p>
+
+    <div class="timer" id="timer" aria-live="polite"></div>
+
+    <button class="btn btn-primary drink-btn" id="btnDrink">💧 TOMÉ AGUA AHORA</button>
+
+    <div class="week" id="week" aria-label="Esta semana"></div>
+
+    <div class="meta">
+      <span class="streak" id="streak"></span>
+      <button class="btn btn-text" id="btnReset">Reiniciar mis 2 litros</button>
+    </div>
+  </section>
+
+  <footer class="foot">Una pausa para ti · by CAFÉ</footer>
+</main>
+
+<!-- =========================================================
+     ALARMA
+     ========================================================= -->
+<div class="overlay" id="alarm" role="alertdialog" aria-modal="true" aria-labelledby="alarmMsg">
+  <div class="overlay-inner">
+    <div class="ripples">
+      <i></i><i></i><i></i><i></i>
+      <svg class="drop"><use href="#drop"/></svg>
+    </div>
+    <h2 class="alarm-msg" id="alarmMsg"></h2>
+    <p class="alarm-sub" id="alarmSub"></p>
+    <div class="alarm-actions">
+      <button class="btn btn-primary btn-block" id="btnDone">YA TOMÉ</button>
+      <button class="btn btn-soft btn-block" id="btnSnooze">10 MINUTOS MÁS</button>
+    </div>
+  </div>
+</div>
+
+<!-- =========================================================
+     CELEBRACIÓN
+     ========================================================= -->
+<div class="overlay celebrate" id="celebrate" role="dialog" aria-modal="true" aria-labelledby="celTitle">
+  <svg class="fall"><use href="#drop"/></svg>
+  <svg class="fall"><use href="#drop"/></svg>
+  <svg class="fall"><use href="#drop"/></svg>
+  <svg class="fall"><use href="#drop"/></svg>
+  <div class="overlay-inner">
+    <div class="ripples">
+      <i></i><i></i><i></i><i></i>
+      <svg class="drop"><use href="#drop"/></svg>
+    </div>
+    <h2 class="cel-title" id="celTitle">2 litros. Hecho. 💧</h2>
+    <p class="cel-text">Hoy hubo al menos una cosa que hiciste por ti.</p>
+    <p class="cel-stats" id="celStats"></p>
+    <div class="cel-extra" id="celExtra">
+      <small>Ya que estás aquí…</small>
+      <p>¿A qué podrías decirle NO para decirte un poquito más SÍ a ti?</p>
+    </div>
+    <button class="btn btn-soft" id="btnCelClose" style="margin-top:8px">CERRAR</button>
+  </div>
+</div>
+
+<!-- =========================================================
+     MICROPAUSA
+     ========================================================= -->
+<div class="micro-veil" id="microVeil" aria-hidden="true"></div>
+<div class="micro" id="micro" role="status" aria-live="polite">
+  <button class="micro-close" id="microClose" type="button" aria-label="Cerrar">✕</button>
+  <small id="microTitle">Ya que estás aquí…</small>
+  <p id="microQ"></p>
+  <span class="micro-sign" id="microSign">una pausa de CAFÉ ☕</span>
+  <div class="bar"><i></i></div>
+</div>
+
+<!-- =========================================================
+     CONFIGURACIÓN
+     ========================================================= -->
+<div class="overlay sheet" id="settings" role="dialog" aria-modal="true" aria-labelledby="setTitle">
+  <div class="sheet-panel">
+    <div class="sheet-head">
+      <h2 id="setTitle">Configuración</h2>
+      <button class="close-x" id="setClose" aria-label="Cerrar">✕</button>
+    </div>
+
+    <div class="group">
+      <label class="field"><span>Tu nombre</span><input id="sName" class="input" type="text" maxlength="30"></label>
+      <label class="field"><span>Objetivo de agua diario</span>
+        <div class="inline-unit"><input id="sGoal" class="input" type="number" min="500" max="5000" step="100"><span>ml</span></div>
+      </label>
+    </div>
+
+    <div class="group">
+      <h3>Tu horario</h3>
+      <div class="two">
+        <label class="field"><span>Hora de inicio</span><input id="sStart" class="input" type="time"></label>
+        <label class="field"><span>Hora de fin</span><input id="sEnd" class="input" type="time"></label>
+      </div>
+      <div class="field"><span>Días con recordatorios</span><div class="chips days" id="sDays"></div></div>
+      <label class="field"><span>Frecuencia</span>
+        <select id="sFreq" class="input">
+          <option value="30">Cada 30 min</option>
+          <option value="45">Cada 45 min</option>
+          <option value="60">Cada 60 min</option>
+          <option value="90">Cada 90 min</option>
+          <option value="custom">Personalizado</option>
+        </select>
+      </label>
+      <div class="inline-unit" id="sFreqCustomWrap" hidden>
+        <input id="sFreqCustom" class="input" type="number" min="10" max="240" step="5"><span>minutos</span>
+      </div>
+      <p class="hint" id="sFreqHint"></p>
+    </div>
+
+    <div class="group">
+      <h3>Avisos</h3>
+      <div class="switch-row">
+        <p>🔊 Sonido<small>Un sonido suave, como una gota.</small></p>
+        <label class="switch"><input type="checkbox" id="sSound" aria-label="Sonido"><span></span></label>
+      </div>
+      <div class="switch-row">
+        <p>🔔 Notificaciones<small>Aviso del sistema cuando llegue tu pausa.</small></p>
+        <label class="switch"><input type="checkbox" id="sNotif" aria-label="Notificaciones"><span></span></label>
+      </div>
+      <p class="hint" id="sNotifHint"></p>
+      <p class="hint">Los recordatorios funcionan mientras esta página esté abierta (aunque sea en otra pestaña). Si cierras el navegador, el dispositivo se bloquea o el sistema suspende la pestaña, el aviso puede llegar tarde o no sonar. Al volver, todo se recalcula al instante.</p>
+    </div>
+
+    <div class="group">
+      <h3>Personalidad de los recordatorios</h3>
+      <div class="pers">
+        <label><input type="radio" name="pers" value="suave"><span><b>Suave</b><em>«Cuando puedas, regálate un vaso de agua. 💧»</em></span></label>
+        <label><input type="radio" name="pers" value="directo"><span><b>Directo</b><em>«Agua. Ahora. Son 30 segundos.»</em></span></label>
+        <label><input type="radio" name="pers" value="humor"><span><b>Con humor</b><em>«Ese correo puede esperar 30 segundos. Agua. 😂»</em></span></label>
+      </div>
+    </div>
+
+    <p class="hint warn" id="sError"></p>
+    <div class="sheet-actions">
+      <button class="btn btn-text" id="setCancel">Cancelar</button>
+      <button class="btn btn-primary" id="setSave">GUARDAR</button>
+    </div>
+  </div>
+</div>
+
+<!-- =========================================================
+     CONFIRMACIÓN
+     ========================================================= -->
+<div class="overlay" id="confirm" role="alertdialog" aria-modal="true" aria-labelledby="confTitle">
+  <div class="overlay-inner confirm-box">
+    <h3 id="confTitle">¿Reiniciar tus 2 litros de hoy?</h3>
+    <p>El vaso vuelve a llenarse y el contador de hoy empieza de cero. Tus preferencias se mantienen.</p>
+    <div class="confirm-actions">
+      <button class="btn btn-text" id="confNo">Cancelar</button>
+      <button class="btn btn-primary" id="confYes">REINICIAR</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* =============================================================
+   UNA PAUSA PARA TI · by CAFÉ
+   Recordatorio amable para tomar agua. Todo en localStorage.
+   ============================================================= */
+(() => {
+'use strict';
+
+/* -------------------------------------------------------------
+   1. CONSTANTES Y TEXTOS
+   ------------------------------------------------------------- */
+const KEY = 'unaPausaParaTi.v1';
+const MIN = 60000;
+const FREQ_OPTIONS = [30, 45, 60, 90];
+const SNOOZE_MIN = 10;
+const DAY_ORDER = [1, 2, 3, 4, 5, 6, 0];              // L M X J V S D (índices de Date.getDay)
+const DAY_LETTERS = { 1:'L', 2:'M', 3:'X', 4:'J', 5:'V', 6:'S', 0:'D' };
+const DAY_NAMES = { 1:'Lunes', 2:'Martes', 3:'Miércoles', 4:'Jueves', 5:'Viernes', 6:'Sábado', 0:'Domingo' };
+
+const DEFAULT_CONFIG = {
+  name: '', goal: 2000, start: '08:00', end: '22:00',
+  days: [true, true, true, true, true, true, true],
+  freq: 90, sound: true, notif: false, personality: 'suave', onboarded: false
+};
+
+// Mensajes de recordatorio según personalidad (n = nombre)
+const REMINDERS = {
+  suave: [
+    n => `💧 ${n}, una pausa para ti.`,
+    () => 'Cuando puedas, regálate un vaso de agua. 💧',
+    () => '💧 30 segundos para ti.',
+    () => 'Un sorbo, una respiración y seguimos. 💧',
+    n => `${n}, tu vaso te espera sin prisa. 💧`
+  ],
+  directo: [
+    () => 'Agua. Ahora. Son 30 segundos.',
+    () => '💧 Pausa. Agua. Y seguimos.',
+    () => '💧 Antes de seguir… agua.',
+    n => `${n}: vaso, agua, listo. 💧`,
+    () => 'Un vaso. Ya. Luego sigues. 💧'
+  ],
+  humor: [
+    () => 'Ese correo puede esperar 30 segundos. Agua. 😂',
+    () => 'Hora de regar a la persona más importante del día: tú. 🌱',
+    () => 'Plot twist: el agua no se bebe sola. 💧',
+    () => 'Nadie se ha arrepentido nunca de un vaso de agua. 😌',
+    n => `${n}, el mundo puede girar 30 segundos sin ti. Agua. 🌍`
+  ]
+};
+
+const POSITIVE = [
+  'Bien ahí. 💧', 'Uno menos.', 'Seguimos.',
+  'Pequeña pausa. Gran diferencia.', 'Listo. A lo tuyo.', 'Eso también cuenta.'
+];
+
+/* Tarjetas tras cada toma: tres tipos de contenido.
+   Tipo 2 · Mensajes breves ("Antes de seguir…") */
+const MESSAGES = [
+  'No todo tiene que resolverse hoy.',
+  'También cuenta hacer las cosas con un poco más de calma.',
+  'Puedes seguir en un minuto.',
+  'No todo lo urgente merece tu energía.',
+  'A veces hacer una pausa también es avanzar.',
+  'Que puedas hacerlo no significa que tengas que hacerlo ahora.',
+  'Un ratito para ti también cabe en el día.',
+  'No necesitas aprovechar cada minuto.',
+  'Hay cosas que pueden esperar.',
+  'Haz espacio también para lo que te hace bien.'
+];
+
+/* Tipo 3 · La pausa de CAFÉ.
+   PROVISIONAL: sustituir por las reflexiones oficiales de CAFÉ (una por línea). */
+const CAFE_REFLECTIONS = [
+  '¿A qué podrías decirle NO para decirte un poquito más SÍ a ti?',
+  'Tu agenda también puede tener huecos que son solo tuyos.',
+  'Hacer menos, pero con más intención, también es una forma de avanzar.',
+  'Cuidarte no es algo que se hace cuando sobra tiempo.',
+  'Lo importante rara vez grita. Lo urgente, casi siempre.',
+  'Un día bueno no es el que más rinde, sino el que mejor se vive.'
+];
+
+const QUESTIONS = [
+  '¿Cómo vas de energía ahora mismo?',
+  '¿Qué te vendría bien en este momento?',
+  '¿Hay algo que puedas dejar para después?',
+  '¿Qué ha estado bien de tu día hasta ahora?',
+  '¿Te has regalado aunque sea 5 minutos hoy?',
+  '¿Lo próximo que vas a hacer es realmente importante?',
+  '¿Hay algo que hoy puedas hacer más fácil?',
+  '¿Hay algún «sí» que podrías pensarte un poquito más?',
+  '¿Qué pequeño gusto podrías darte hoy?',
+  '¿Qué tendría que pasar para que hoy termine siendo un buen día?'
+];
+
+/* -------------------------------------------------------------
+   2. UTILIDADES
+   ------------------------------------------------------------- */
+const $ = s => document.querySelector(s);
+const pad = n => String(n).padStart(2, '0');
+const clone = o => JSON.parse(JSON.stringify(o));
+
+function dateKey(d = new Date()) {
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}
+function timeToMin(t) {
+  const [h, m] = String(t || '0:0').split(':').map(Number);
+  return (h || 0) * 60 + (m || 0);
+}
+function fmtTime(t) {                        // "08:00" -> "8:00"
+  const m = timeToMin(t);
+  return `${Math.floor(m / 60)}:${pad(m % 60)}`;
+}
+function tsToday(t) {                        // timestamp de hoy a la hora dada
+  const d = new Date(); const m = timeToMin(t);
+  d.setHours(Math.floor(m / 60), m % 60, 0, 0);
+  return d.getTime();
+}
+function fmtMl(n) {                          // 1600 -> "1.600" (separador de miles español)
+  return String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+}
+function fmtL(ml) {                          // 1400 -> "1,4 L"
+  const v = Math.round(ml / 100) / 10;
+  return `${String(v).replace('.', ',')} L`;
+}
+function litersText(ml) {                    // 2000 -> "2 litros"
+  const v = Math.round(ml / 100) / 10;
+  const s = String(v).replace('.', ',');
+  return v === 1 ? '1 litro' : `${s} litros`;
+}
+function fmtCountdown(ms) {
+  const s = Math.max(0, Math.ceil(ms / 1000));
+  const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), sec = s % 60;
+  return h > 0 ? `${h}:${pad(m)}:${pad(sec)}` : `${pad(m)}:${pad(sec)}`;
+}
+const lastPicks = {};
+function pick(arr, tag) {                    // aleatorio sin repetir el anterior
+  if (arr.length === 1) return arr[0];
+  let i;
+  do { i = Math.floor(Math.random() * arr.length); } while (i === lastPicks[tag]);
+  lastPicks[tag] = i;
+  return arr[i];
+}
+const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
+
+/* -------------------------------------------------------------
+   3. ESTADO Y PERSISTENCIA
+   ------------------------------------------------------------- */
+function freshDay(override = false) {
+  return {
+    date: dateKey(), consumed: 0, pauses: 0,
+    nextAt: null,           // timestamp exacto del próximo recordatorio
+    alarmPending: false,    // hay una pausa esperando respuesta
+    override,               // "activar solo por hoy"
+    completed: false, celebrated: false
+  };
+}
+
+function load() {
+  const base = { config: clone(DEFAULT_CONFIG), day: null, history: {}, since: dateKey(), drinksSinceMicro: 0 };
+  try {
+    const raw = localStorage.getItem(KEY);
+    if (!raw) return base;
+    const d = JSON.parse(raw);
+    return {
+      config: { ...clone(DEFAULT_CONFIG), ...(d.config || {}) },
+      day: d.day || null,
+      history: d.history || {},
+      since: d.since || dateKey(),
+      drinksSinceMicro: d.drinksSinceMicro || 0,
+      micro: d.micro || null        // control de repeticiones de las tarjetas del día
+    };
+  } catch (e) { return base; }
+}
+function save() {
+  try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { /* almacenamiento no disponible */ }
+}
+
+let S = load();
+
+/* -------------------------------------------------------------
+   4. LÓGICA DE PAUSAS
+   ------------------------------------------------------------- */
+const cfg = () => S.config;
+const dayMinutes = (c = cfg()) => Math.max(0, timeToMin(c.end) - timeToMin(c.start));
+const totalPauses = (c = cfg()) => Math.max(1, Math.floor(dayMinutes(c) / c.freq));
+const perPause = (c = cfg()) => Math.max(10, Math.round(c.goal / totalPauses(c) / 10) * 10);
+const remaining = () => Math.max(0, cfg().goal - S.day.consumed);
+const isActive = () => !!cfg().days[new Date().getDay()] || !!S.day.override;
+
+// Frecuencia sugerida: repartir en ~8 pausas y ajustar a la opción más cercana
+function suggestFreq(c = cfg()) {
+  const ideal = dayMinutes(c) / 8;
+  return FREQ_OPTIONS.reduce((a, b) => Math.abs(b - ideal) < Math.abs(a - ideal) ? b : a);
+}
+
+// Cantidad coherente para la próxima pausa; la última se lleva lo que quede
+function nextAmount() {
+  const rem = remaining();
+  const left = totalPauses() - S.day.pauses;
+  if (left <= 1) return rem;
+  return Math.min(rem, perPause());
+}
+
+// Calcula el próximo recordatorio dentro del horario del día
+function computeNext(from) {
+  const s = tsToday(cfg().start), e = tsToday(cfg().end);
+  if (e <= s) return null;
+  let t = Math.max(from, s) + cfg().freq * MIN;
+  if (t > e) {
+    if (from < e - 10 * MIN) t = e;   // una última pausa al final del día
+    else return null;                  // el día ya terminó
+  }
+  return t;
+}
+
+function recordHistory() {
+  const d = S.day;
+  if (d.consumed > 0 || S.history[d.date]) {
+    S.history[d.date] = { consumed: d.consumed, goal: cfg().goal, done: d.completed };
+  }
+  // Mantener solo ~120 días
+  const keys = Object.keys(S.history).sort();
+  while (keys.length > 120) delete S.history[keys.shift()];
+}
+
+function newDay() {
+  S.day = freshDay(false);
+  if (isActive()) S.day.nextAt = computeNext(Date.now());
+  save();
+}
+
+/* Racha: días completados consecutivos. Los días sin recordatorios programados no cortan la racha. */
+function streak() {
+  let count = 0;
+  const d = new Date(); d.setHours(12, 0, 0, 0);
+  const t = S.history[dateKey()];
+  if (!(t && t.done)) d.setDate(d.getDate() - 1);
+  for (let i = 0; i < 400; i++) {
+    const k = dateKey(d);
+    if (k < S.since) break;
+    const h = S.history[k];
+    if (h && h.done) count++;
+    else if (cfg().days[d.getDay()] || (h && h.consumed > 0)) break;
+    d.setDate(d.getDate() - 1);
+  }
+  return count;
+}
+
+/* ¿Ayer quedó agua en el vaso? (solo si ayer era un día programado) */
+function yesterdayLeftWater() {
+  const d = new Date(); d.setHours(12, 0, 0, 0); d.setDate(d.getDate() - 1);
+  const k = dateKey(d);
+  if (k < S.since) return false;
+  const h = S.history[k];
+  if (h) return !h.done;
+  return !!cfg().days[d.getDay()];
+}
+
+/* -------------------------------------------------------------
+   5. SONIDO (Web Audio: gotas suaves, sin archivos externos)
+   ------------------------------------------------------------- */
+let actx = null;
+function unlockAudio() {
+  try {
+    if (!actx) {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (AC) actx = new AC();
+    }
+    if (actx && actx.state === 'suspended') actx.resume();
+  } catch (e) {}
+}
+function bloop(t0, f, vol = 0.18) {
+  const o = actx.createOscillator(), g = actx.createGain();
+  o.type = 'sine';
+  o.frequency.setValueAtTime(f, t0);
+  o.frequency.exponentialRampToValueAtTime(f * 1.9, t0 + 0.12);
+  g.gain.setValueAtTime(0.0001, t0);
+  g.gain.exponentialRampToValueAtTime(vol, t0 + 0.012);
+  g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.5);
+  o.connect(g); g.connect(actx.destination);
+  o.start(t0); o.stop(t0 + 0.55);
+}
+function playChime() {
+  if (!cfg().sound) return;
+  unlockAudio();
+  if (!actx || actx.state !== 'running') return;
+  const t = actx.currentTime + 0.03;
+  bloop(t, 520); bloop(t + 0.22, 660, 0.14); bloop(t + 0.5, 440, 0.12);
+}
+function playSip() {
+  if (!cfg().sound || !actx || actx.state !== 'running') return;
+  bloop(actx.currentTime + 0.02, 600, 0.09);
+}
+let alarmSoundTimer = null, alarmRings = 0;
+function startAlarmSound() {
+  stopAlarmSound();
+  alarmRings = 0;
+  playChime();
+  alarmSoundTimer = setInterval(() => {
+    if (++alarmRings >= 4) return stopAlarmSound();   // suena pocas veces, sin insistir
+    playChime();
+  }, 7000);
+}
+function stopAlarmSound() { clearInterval(alarmSoundTimer); alarmSoundTimer = null; }
+
+/* -------------------------------------------------------------
+   6. NOTIFICACIONES
+   ------------------------------------------------------------- */
+const notifSupported = () => 'Notification' in window;
+async function requestNotif() {
+  if (!notifSupported()) return 'unsupported';
+  if (Notification.permission === 'granted') return 'granted';
+  if (Notification.permission === 'denied') return 'denied';
+  try {
+    const r = Notification.requestPermission();
+    return r && r.then ? await r : await new Promise(res => Notification.requestPermission(res));
+  } catch (e) { return 'denied'; }
+}
+function notify(title, body) {
+  if (!cfg().notif || !notifSupported() || Notification.permission !== 'granted') return;
+  try {
+    const n = new Notification(title, { body, tag: 'una-pausa-agua', renotify: true, silent: !cfg().sound });
+    n.onclick = () => { window.focus(); n.close(); };
+  } catch (e) {
+    // Algunos navegadores móviles solo permiten notificaciones con service worker o app instalada.
+  }
+}
+function notifHintText() {
+  if (!notifSupported()) return 'Este navegador no permite notificaciones web. Los avisos se mostrarán en pantalla.';
+  if (Notification.permission === 'denied') return 'El permiso está bloqueado. Puedes activarlo desde los ajustes del navegador para este sitio.';
+  return '';
+}
+
+/* -------------------------------------------------------------
+   7. EL AGUA (animación SVG con requestAnimationFrame)
+   ------------------------------------------------------------- */
+const TOP_Y = 40, BOTTOM_Y = 303;          // nivel lleno / vacío dentro del vaso
+let levelShown = 0, agitation = 0.35, phase = 0, lastFrame = 0;
+const bubbles = [];
+const elWaveBack = $('#waveBack'), elWaveFront = $('#waveFront'), elWaveLine = $('#waveLine');
+const elWater = $('#waterGroup'), elBubbles = $('#bubbles');
+
+(function makeBubbles() {
+  for (let i = 0; i < 9; i++) {
+    const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    c.setAttribute('fill', 'rgba(255,255,255,.55)');
+    elBubbles.appendChild(c);
+    bubbles.push({ el: c, x: 70 + Math.random() * 100, y: 300 - Math.random() * 200, r: 1 + Math.random() * 2.4, v: 10 + Math.random() * 18, w: Math.random() * 6 });
+  }
+})();
+
+function levelTarget() {
+  if (!S.day) return 1;
+  return cfg().goal > 0 ? remaining() / cfg().goal : 0;
+}
+
+function wavePath(y, amp, len, ph, closed) {
+  let d = '';
+  for (let x = 20; x <= 220; x += 5) {
+    const yy = y + Math.sin((x / len) * Math.PI * 2 + ph) * amp + Math.sin((x / (len * 0.47)) * Math.PI * 2 - ph * 1.3) * amp * 0.25;
+    d += (x === 20 ? 'M' : 'L') + x + ' ' + yy.toFixed(2) + ' ';
+  }
+  return closed ? d + 'L220 345 L20 345 Z' : d;
+}
+
+function frame(ts) {
+  const dt = Math.min(0.05, (ts - (lastFrame || ts)) / 1000);
+  lastFrame = ts;
+
+  // Nivel: aproximación suave al objetivo
+  const target = levelTarget();
+  levelShown += (target - levelShown) * Math.min(1, dt * 1.9);
+  const moving = Math.abs(target - levelShown);
+
+  // Ondas: más vivas cuando el agua se mueve
+  agitation = Math.max(0, agitation - dt * 0.35);
+  const amp = 2.4 + agitation * 7 + Math.min(moving * 30, 4);
+  phase += dt * (1.1 + agitation * 1.8);
+
+  const y = BOTTOM_Y - levelShown * (BOTTOM_Y - TOP_Y);
+  elWaveBack.setAttribute('d', wavePath(y - 2, amp * 0.8, 150, -phase * 0.8 + 1.6, true));
+  elWaveFront.setAttribute('d', wavePath(y, amp, 120, phase, true));
+  elWaveLine.setAttribute('d', wavePath(y, amp, 120, phase, false));
+  elWater.style.opacity = Math.min(1, levelShown * 30).toFixed(3);
+
+  // Burbujas que suben hasta la superficie
+  bubbles.forEach(b => {
+    b.y -= b.v * dt;
+    b.w += dt * 2;
+    if (b.y < y + 6) { b.y = 300; b.x = 70 + Math.random() * 100; }
+    b.el.setAttribute('cx', (b.x + Math.sin(b.w) * 3).toFixed(1));
+    b.el.setAttribute('cy', b.y.toFixed(1));
+    b.el.setAttribute('r', b.r);
+    b.el.setAttribute('opacity', levelShown > 0.04 ? 0.8 : 0);
+  });
+
+  requestAnimationFrame(frame);
+}
+
+/* -------------------------------------------------------------
+   8. RENDER DE LA PANTALLA PRINCIPAL
+   ------------------------------------------------------------- */
+let shownRemaining = null, numAnim = null;
+
+function renderHeader() {
+  const c = cfg(), d = S.day;
+  $('#greet').textContent = `Hola, ${c.name} 👋`;
+  if (d.completed) {
+    $('#remainLine').textContent = 'Hoy el vaso quedó vacío. 💧';
+  } else {
+    $('#remainLine').innerHTML = `Hoy nos quedan <strong id="remainNum">${fmtMl(shownRemaining ?? remaining())}</strong> ml.`;
+  }
+  const note = $('#note');
+  const showNote = !d.completed && d.consumed === 0 && isActive() && yesterdayLeftWater();
+  note.hidden = !showNote;
+  if (showNote) note.textContent = 'Ayer quedó agua en el vaso. Hoy empezamos de nuevo.';
+}
+
+// Cuenta regresiva del número restante (microanimación)
+function animateRemaining(from, to) {
+  cancelAnimationFrame(numAnim);
+  const t0 = performance.now(), dur = 1300;
+  const step = now => {
+    const p = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - p, 3);
+    shownRemaining = Math.round(from + (to - from) * e);
+    const el = $('#remainNum');
+    if (el) el.textContent = fmtMl(shownRemaining);
+    if (p < 1) numAnim = requestAnimationFrame(step); else shownRemaining = null;
+  };
+  numAnim = requestAnimationFrame(step);
+}
+
+function renderStats() {
+  const d = S.day, total = totalPauses();
+  $('#stats').innerHTML =
+    `Tomaste <b>${fmtMl(d.consumed)} ml</b> · Quedan <b>${fmtMl(remaining())} ml</b><br>` +
+    `${Math.min(d.pauses, total)} de ${total} pausas`;
+}
+
+let timerMode = '';
+function renderTimer() {
+  const d = S.day, el = $('#timer');
+  const now = Date.now();
+  let mode, html;
+
+  if (d.completed) {
+    mode = 'done';
+    html = `<p class="timer-msg big">Por hoy, todo listo. 🌿</p><p class="timer-label">Sin más recordatorios hasta mañana.</p>`;
+  } else if (!isActive()) {
+    mode = 'rest';
+    html = `<div class="rest"><p>Hoy tienes tus pausas en descanso. 🌿</p><button class="btn btn-soft" id="btnActivate">ACTIVAR SOLO POR HOY</button></div>`;
+  } else if (d.alarmPending) {
+    mode = 'pending';
+    html = `<p class="timer-msg big">Es momento de una pausa. 💧</p>`;
+  } else if (d.nextAt) {
+    mode = 'count';
+    const label = now < tsToday(cfg().start) ? `Tu día empieza a las ${fmtTime(cfg().start)} · primera pausa en` : 'Próxima pausa en';
+    html = `<p class="timer-label">${label}</p><p class="timer-count" id="count">${fmtCountdown(d.nextAt - now)}</p>`;
+  } else {
+    mode = 'ended';
+    html = `<p class="timer-msg">Por hoy ya no hay más recordatorios. Si te apetece, el botón sigue aquí.</p>`;
+  }
+
+  const key = mode + (mode === 'count' && now < tsToday(cfg().start) ? 'pre' : '');
+  if (key !== timerMode) {
+    el.innerHTML = html;
+    timerMode = key;
+    const act = $('#btnActivate');
+    if (act) act.addEventListener('click', activateToday);
+  }
+  updateCountdown();
+}
+
+function updateCountdown() {
+  const el = $('#count');
+  if (el && S.day.nextAt) el.textContent = fmtCountdown(S.day.nextAt - Date.now());
+}
+
+function renderWeek() {
+  const now = new Date(); now.setHours(12, 0, 0, 0);
+  const dow = (now.getDay() + 6) % 7;                 // lunes = 0
+  const monday = new Date(now); monday.setDate(now.getDate() - dow);
+  const today = dateKey();
+  let html = '';
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(monday); d.setDate(monday.getDate() + i);
+    const k = dateKey(d), h = S.history[k];
+    let val = '—', cls = '';
+    if (h && h.done) { val = '✓'; cls = 'done'; }
+    else if (h && h.consumed > 0) { val = fmtL(h.consumed); cls = 'part'; }
+    if (k === today) cls += ' today';
+    const label = `${DAY_NAMES[d.getDay()]}: ${val === '✓' ? 'completado' : val === '—' ? 'sin registro' : val}`;
+    html += `<div class="wd ${cls}" aria-label="${label}"><b>${DAY_LETTERS[d.getDay()]}</b><span>${val}</span></div>`;
+  }
+  $('#week').innerHTML = html;
+}
+
+function renderMeta() {
+  const s = streak();
+  $('#streak').textContent = s > 0 ? `Racha: ${plural(s, 'día', 'días')}` : '';
+  $('#btnReset').textContent = `Reiniciar mis ${litersText(cfg().goal)}`;
+  $('#confTitle').textContent = `¿Reiniciar tus ${litersText(cfg().goal)} de hoy?`;
+  const b = $('#btnDrink');
+  b.disabled = S.day.completed;
+  b.textContent = S.day.completed ? 'VASO VACÍO POR HOY 💧' : '💧 TOMÉ AGUA AHORA';
+}
+
+function renderAll() {
+  renderHeader(); renderStats(); renderTimer(); renderWeek(); renderMeta();
+}
+
+/* -------------------------------------------------------------
+   9. ACCIONES
+   ------------------------------------------------------------- */
+function drink() {
+  const d = S.day;
+  if (d.completed) return;
+  unlockAudio();
+  const before = remaining();
+  d.consumed = Math.min(cfg().goal, d.consumed + nextAmount());
+  d.pauses++;
+  d.alarmPending = false;
+  if (d.consumed >= cfg().goal) {
+    d.completed = true;
+    d.nextAt = null;                                     // se detienen los recordatorios del día
+  } else {
+    d.nextAt = computeNext(Date.now());                  // reinicia el temporizador
+  }
+  recordHistory();
+  save();
+
+  agitation = 1;
+  playSip();
+  renderAll();
+  if (!d.completed) animateRemaining(before, remaining());
+
+  if (d.completed) {
+    setTimeout(celebrate, 1900);                         // deja ver el vaso vaciarse primero
+  } else {
+    showToast(pick(POSITIVE, 'pos'));
+    queueMicro();
+  }
+}
+
+function activateToday() {
+  unlockAudio();
+  S.day.override = true;
+  if (!S.day.completed && !S.day.nextAt) S.day.nextAt = computeNext(Date.now());
+  save();
+  renderAll();
+  showToast('Pausas activadas por hoy. 🌿');
+}
+
+function resetDay() {
+  const override = S.day.override;
+  S.day = freshDay(override);
+  if (isActive()) S.day.nextAt = computeNext(Date.now());
+  delete S.history[S.day.date];
+  save();
+  hideAlarm();
+  agitation = 1;
+  renderAll();
+  showToast('Vaso lleno de nuevo. 💧');
+}
+
+/* -------------------------------------------------------------
+   10. ALARMA
+   ------------------------------------------------------------- */
+const baseTitle = document.title;
+let titleBlink = null;
+
+function fireAlarm(fresh) {
+  S.day.alarmPending = true;
+  S.day.nextAt = null;
+  save();
+  showAlarm(fresh);
+  renderTimer();
+}
+
+function showAlarm(fresh) {
+  const c = cfg();
+  const msg = pick(REMINDERS[c.personality] || REMINDERS.suave, 'rem')(c.name || '');
+  const amount = nextAmount();
+  const sub = `Pausa ${Math.min(S.day.pauses + 1, totalPauses())} de ${totalPauses()} · unos ${fmtMl(amount)} ml`;
+  $('#alarmMsg').textContent = msg;
+  $('#alarmSub').textContent = sub;
+  $('#alarm').classList.add('show');
+  hideMicro();
+  if (fresh) {
+    startAlarmSound();
+    notify(msg, sub);
+    if (document.hidden) {
+      let on = false;
+      clearInterval(titleBlink);
+      titleBlink = setInterval(() => { document.title = (on = !on) ? '💧 Una pausa para ti' : baseTitle; }, 1500);
+    }
+  }
+  setTimeout(() => $('#btnDone').focus({ preventScroll: true }), 400);
+}
+
+function hideAlarm() {
+  $('#alarm').classList.remove('show');
+  stopAlarmSound();
+  clearInterval(titleBlink); titleBlink = null;
+  document.title = baseTitle;
+}
+
+/* -------------------------------------------------------------
+   11. MENSAJES, MICROPAUSAS Y CELEBRACIÓN
+   ------------------------------------------------------------- */
+let toastTimer = null;
+function showToast(text) {
+  const t = $('#toast');
+  t.textContent = text;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+/* Cada toma de agua genera una tarjeta, alternando tres tipos:
+   ~45 % pregunta · ~40 % mensaje breve · ~15 % La pausa de CAFÉ */
+const MICRO_TYPES = {
+  q: { title: 'Ya que estás aquí…',    list: () => QUESTIONS,        weight: 45 },
+  m: { title: 'Antes de seguir…',      list: () => MESSAGES,         weight: 40 },
+  c: { title: '☕ LA PAUSA DE CAFÉ',    list: () => CAFE_REFLECTIONS, weight: 15 }
+};
+
+/* Elige contenido sin repetir el anterior y sin repetir en el día
+   hasta haber usado los demás de ese tipo. Se guarda en localStorage. */
+function pickMicroContent() {
+  const today = dateKey();
+  if (!S.micro || S.micro.date !== today) {
+    S.micro = { date: today, used: { q: [], m: [], c: [] }, last: S.micro ? S.micro.last : null };
+  }
+  const mc = S.micro;
+
+  // Tipo ponderado
+  const total = Object.values(MICRO_TYPES).reduce((a, t) => a + t.weight, 0);
+  let r = Math.random() * total, type = 'q';
+  for (const k of Object.keys(MICRO_TYPES)) {
+    if ((r -= MICRO_TYPES[k].weight) < 0) { type = k; break; }
+  }
+
+  const list = MICRO_TYPES[type].list();
+  let used = mc.used[type] || [];
+  let pool = list.map((_, i) => i).filter(i => !used.includes(i));
+  if (!pool.length) { used = []; pool = list.map((_, i) => i); }          // ciclo completo: se reinicia
+  const lastIdx = mc.last && mc.last.t === type ? mc.last.i : -1;
+  if (pool.length > 1) pool = pool.filter(i => i !== lastIdx);           // nunca dos veces seguidas
+  const i = pool[Math.floor(Math.random() * pool.length)];
+
+  used.push(i);
+  mc.used[type] = used;
+  mc.last = { t: type, i };
+  save();
+  return { type, title: MICRO_TYPES[type].title, text: list[i] };
+}
+
+let microTimer = null, microDelay = null;
+function queueMicro() {
+  clearTimeout(microDelay);
+  microDelay = setTimeout(showMicro, 900);          // tras ver bajar el vaso y la confirmación
+}
+function showMicro() {
+  if ($('#alarm').classList.contains('show') || $('#celebrate').classList.contains('show')) return;
+  const m = $('#micro'), dur = 12000;                // 12 segundos visibles
+  const c = pickMicroContent();
+  $('#microTitle').textContent = c.title;
+  $('#microQ').textContent = c.text;
+  $('#microSign').hidden = c.type === 'c';           // evita duplicar la firma en La pausa de CAFÉ
+  m.style.setProperty('--dur', dur + 'ms');
+  m.classList.remove('show'); void m.offsetWidth;   // reinicia animación y barra
+  m.classList.add('show');
+  $('#microVeil').classList.add('show');
+  clearTimeout(microTimer);
+  microTimer = setTimeout(hideMicro, dur);
+}
+function hideMicro() {
+  clearTimeout(microTimer);
+  $('#micro').classList.remove('show');
+  $('#microVeil').classList.remove('show');
+}
+
+let celTimer = null;
+function celebrate() {
+  const d = S.day;
+  d.celebrated = true; save();
+  $('#celTitle').textContent = `${litersText(cfg().goal).replace(/^./, ch => ch.toUpperCase())}. Hecho. 💧`;
+  $('#celStats').textContent = `${plural(d.pauses, 'pausa', 'pausas')} · ${fmtMl(cfg().goal)} ml`;
+  const extra = $('#celExtra');
+  extra.classList.remove('show');
+  hideMicro();
+  $('#celebrate').classList.add('show');
+  if (cfg().sound && actx && actx.state === 'running') {
+    const t = actx.currentTime + 0.05;
+    bloop(t, 440, 0.12); bloop(t + 0.3, 550, 0.12); bloop(t + 0.6, 660, 0.12); bloop(t + 1.0, 880, 0.1);
+  }
+  clearTimeout(celTimer);
+  celTimer = setTimeout(() => extra.classList.add('show'), 5000);
+}
+
+/* -------------------------------------------------------------
+   12. RELOJ: se basa en timestamps, no en contar ticks
+   ------------------------------------------------------------- */
+let ticker = null;
+function tick() {
+  if (!cfg().onboarded || !S.day) return;
+
+  // Cambio de fecha (medianoche o regreso al día siguiente)
+  if (S.day.date !== dateKey()) {
+    hideAlarm();
+    newDay();
+    timerMode = '';
+    renderAll();
+  }
+
+  const d = S.day, now = Date.now();
+  if (isActive() && !d.completed && !d.alarmPending) {
+    if (d.nextAt && now >= d.nextAt) {
+      // Si la pestaña estuvo dormida mucho rato, se muestra sin sonar
+      fireAlarm(now - d.nextAt < 3 * MIN);
+    } else if (!d.nextAt) {
+      const n = computeNext(now);
+      if (n) { d.nextAt = n; save(); renderTimer(); }
+    }
+  }
+  renderTimer();
+}
+
+function startTicker() {
+  clearInterval(ticker);
+  ticker = setInterval(tick, 1000);
+  tick();
+}
+
+/* -------------------------------------------------------------
+   13. DÍAS (chips reutilizables)
+   ------------------------------------------------------------- */
+function buildDayChips(container, days) {
+  container.innerHTML = '';
+  DAY_ORDER.forEach(i => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'chip' + (days[i] ? ' on' : '');
+    b.textContent = DAY_LETTERS[i];
+    b.title = DAY_NAMES[i];
+    b.setAttribute('aria-label', DAY_NAMES[i]);
+    b.setAttribute('aria-pressed', days[i] ? 'true' : 'false');
+    b.addEventListener('click', () => {
+      days[i] = !days[i];
+      b.classList.toggle('on', days[i]);
+      b.setAttribute('aria-pressed', days[i] ? 'true' : 'false');
+    });
+    container.appendChild(b);
+  });
+}
+
+/* -------------------------------------------------------------
+   14. ONBOARDING
+   ------------------------------------------------------------- */
+let obStep = 0;
+const OB_STEPS = 6;
+let obFreq = 90;
+
+function obGo(n) {
+  obStep = Math.max(0, Math.min(OB_STEPS - 1, n));
+  document.querySelectorAll('.ob-step').forEach(s => s.classList.toggle('active', +s.dataset.step === obStep));
+  $('#obProgress').innerHTML = Array.from({ length: OB_STEPS }, (_, i) => `<i class="${i <= obStep ? 'on' : ''}"></i>`).join('');
+  if (obStep === 1) setTimeout(() => $('#obName').focus(), 300);
+  if (obStep === 4) obPrepareFreq();
+  window.scrollTo(0, 0);
+}
+
+function obSummary(freq) {
+  const c = { ...cfg(), freq };
+  return `Serían ${plural(totalPauses(c), 'pausa', 'pausas')} de unos ${fmtMl(perPause(c))} ml para completar tus ${litersText(c.goal)}.`;
+}
+
+function obPrepareFreq() {
+  const c = cfg();
+  const sug = suggestFreq(c);
+  obFreq = sug;
+  $('#obFreqTitle').textContent = `Si tu día va de ${fmtTime(c.start)} a ${fmtTime(c.end)}, podríamos recordártelo cada ${sug} minutos.`;
+  $('#obFreqSummary').textContent = obSummary(sug);
+  $('#obFreqChange').hidden = true;
+  $('#obFreqToggle').hidden = false;
+  $('#obFreqOk').textContent = 'ME GUSTA ASÍ';
+  buildFreqChips(sug);
+}
+
+function buildFreqChips(selected) {
+  const wrap = $('#obFreqChips');
+  wrap.innerHTML = '';
+  const isCustom = !FREQ_OPTIONS.includes(selected);
+  [...FREQ_OPTIONS, 'custom'].forEach(v => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'chip' + ((v === selected || (v === 'custom' && isCustom)) ? ' on' : '');
+    b.textContent = v === 'custom' ? 'Personalizado' : `${v} min`;
+    b.addEventListener('click', () => {
+      wrap.querySelectorAll('.chip').forEach(x => x.classList.remove('on'));
+      b.classList.add('on');
+      $('#obFreqCustomWrap').hidden = v !== 'custom';
+      obFreq = v === 'custom' ? clampFreq(+$('#obFreqCustom').value) : v;
+      $('#obFreqSummary').textContent = obSummary(obFreq);
+    });
+    wrap.appendChild(b);
+  });
+  $('#obFreqCustomWrap').hidden = !isCustom;
+}
+const clampFreq = v => Math.max(10, Math.min(240, Math.round(v || 60)));
+
+function startOnboarding() {
+  $('#app').hidden = true;
+  $('#onboarding').hidden = false;
+  const c = cfg();
+  $('#obWelcome').textContent = `Vamos a ayudarte a tomar esos ${litersText(c.goal)} de agua 💧`;
+  $('#obName').value = c.name;
+  $('#obStart').value = c.start;
+  $('#obEnd').value = c.end;
+  $('#obSound').checked = c.sound;
+  buildDayChips($('#obDays'), c.days);
+
+  document.querySelectorAll('[data-next]').forEach(b => b.onclick = () => obGo(obStep + 1));
+  document.querySelectorAll('[data-back]').forEach(b => b.onclick = () => obGo(obStep - 1));
+
+  $('#obNameNext').onclick = () => {
+    const n = $('#obName').value.trim();
+    if (!n) { $('#obNameErr').textContent = 'Escribe tu nombre para continuar.'; return; }
+    $('#obNameErr').textContent = '';
+    c.name = n;
+    obGo(2);
+  };
+  $('#obName').onkeydown = e => { if (e.key === 'Enter') $('#obNameNext').click(); };
+
+  $('#obHoursNext').onclick = () => {
+    const s = $('#obStart').value, e = $('#obEnd').value;
+    if (!s || !e || timeToMin(e) - timeToMin(s) < 60) {
+      $('#obHoursErr').textContent = 'La hora de fin debe ser al menos una hora después del inicio.';
+      return;
+    }
+    $('#obHoursErr').textContent = '';
+    c.start = s; c.end = e;
+    $('#obHoursTitle').textContent = `Perfecto, ${c.name}. ¿Cómo es tu día, más o menos?`;
+    obGo(3);
+  };
+
+  $('#obFreqToggle').onclick = () => {
+    $('#obFreqChange').hidden = false;
+    $('#obFreqToggle').hidden = true;
+    $('#obFreqOk').textContent = 'CONTINUAR';
+  };
+  $('#obFreqCustom').oninput = () => {
+    obFreq = clampFreq(+$('#obFreqCustom').value);
+    $('#obFreqSummary').textContent = obSummary(obFreq);
+  };
+  $('#obFreqOk').onclick = () => { c.freq = obFreq; obGo(5); };
+
+  $('#obNotif').onchange = async e => {
+    if (!e.target.checked) return;
+    const r = await requestNotif();
+    if (r !== 'granted') {
+      e.target.checked = false;
+      $('#obNotifHint').textContent = notifHintText() || 'No se concedió el permiso. Puedes activarlo más tarde en Configuración.';
+    }
+  };
+
+  $('#obFinish').onclick = () => {
+    unlockAudio();
+    c.sound = $('#obSound').checked;
+    c.notif = $('#obNotif').checked;
+    c.onboarded = true;
+    S.since = dateKey();
+    S.day = null;
+    save();
+    if (c.sound) playSip();
+    startApp();
+  };
+
+  obGo(0);
+}
+
+/* -------------------------------------------------------------
+   15. CONFIGURACIÓN
+   ------------------------------------------------------------- */
+let draftDays = null;
+
+function openSettings() {
+  const c = cfg();
+  $('#sName').value = c.name;
+  $('#sGoal').value = c.goal;
+  $('#sStart').value = c.start;
+  $('#sEnd').value = c.end;
+  draftDays = c.days.slice();
+  buildDayChips($('#sDays'), draftDays);
+  const isCustom = !FREQ_OPTIONS.includes(c.freq);
+  $('#sFreq').value = isCustom ? 'custom' : String(c.freq);
+  $('#sFreqCustom').value = c.freq;
+  $('#sFreqCustomWrap').hidden = !isCustom;
+  $('#sSound').checked = c.sound;
+  $('#sNotif').checked = c.notif && notifSupported() && Notification.permission === 'granted';
+  $('#sNotifHint').textContent = notifHintText();
+  document.querySelectorAll('input[name="pers"]').forEach(r => r.checked = r.value === c.personality);
+  $('#sError').textContent = '';
+  updateFreqHint();
+  $('#settings').classList.add('show');
+}
+function closeSettings() { $('#settings').classList.remove('show'); }
+
+function draftFreq() {
+  return $('#sFreq').value === 'custom' ? clampFreq(+$('#sFreqCustom').value) : +$('#sFreq').value;
+}
+function updateFreqHint() {
+  const goal = Math.max(500, Math.min(5000, +$('#sGoal').value || 2000));
+  const c = { ...cfg(), start: $('#sStart').value || cfg().start, end: $('#sEnd').value || cfg().end, freq: draftFreq(), goal };
+  if (timeToMin(c.end) - timeToMin(c.start) < 60) { $('#sFreqHint').textContent = ''; return; }
+  $('#sFreqHint').textContent = `${plural(totalPauses(c), 'pausa', 'pausas')} de unos ${fmtMl(perPause(c))} ml. Sugerencia para tu horario: cada ${suggestFreq(c)} minutos.`;
+}
+
+function saveSettings() {
+  const name = $('#sName').value.trim();
+  const goal = Math.round((+$('#sGoal').value || 0) / 50) * 50;
+  const start = $('#sStart').value, end = $('#sEnd').value;
+  if (!name) return ($('#sError').textContent = 'Escribe tu nombre.');
+  if (goal < 500 || goal > 5000) return ($('#sError').textContent = 'El objetivo debe estar entre 500 y 5.000 ml.');
+  if (!start || !end || timeToMin(end) - timeToMin(start) < 60) return ($('#sError').textContent = 'La hora de fin debe ser al menos una hora después del inicio.');
+
+  const c = cfg(), d = S.day;
+  const scheduleChanged = c.start !== start || c.end !== end || c.freq !== draftFreq() || c.goal !== goal;
+  const wasCompleted = d.completed;
+
+  Object.assign(c, {
+    name, goal, start, end, days: draftDays.slice(), freq: draftFreq(),
+    sound: $('#sSound').checked, notif: $('#sNotif').checked,
+    personality: (document.querySelector('input[name="pers"]:checked') || {}).value || 'suave'
+  });
+
+  // Ajustar el día en curso al nuevo objetivo, sin perder lo ya tomado
+  if (d.consumed >= c.goal) {
+    d.consumed = Math.min(d.consumed, c.goal);
+    d.completed = true; d.nextAt = null; d.alarmPending = false;
+    if (!wasCompleted) d.celebrated = true;
+  } else if (d.completed) {
+    d.completed = false; d.celebrated = false;
+    d.nextAt = isActive() ? computeNext(Date.now()) : null;
+  } else if (scheduleChanged && !d.alarmPending) {
+    d.nextAt = isActive() ? computeNext(Date.now()) : null;
+  }
+  if (!isActive()) { d.nextAt = null; d.alarmPending = false; hideAlarm(); }
+
+  recordHistory();
+  save();
+  timerMode = '';
+  closeSettings();
+  renderAll();
+  showToast('Cambios guardados.');
+}
+
+/* -------------------------------------------------------------
+   16. ARRANQUE Y EVENTOS
+   ------------------------------------------------------------- */
+function startApp() {
+  $('#onboarding').hidden = true;
+  $('#app').hidden = false;
+  if (!S.day || S.day.date !== dateKey()) newDay();
+  timerMode = '';
+  renderAll();
+  if (S.day.alarmPending && isActive() && !S.day.completed) showAlarm(false);
+  if (S.day.completed && !S.day.celebrated) setTimeout(celebrate, 900);
+  startTicker();
+}
+
+function bindEvents() {
+  // Desbloquear audio con la primera interacción (requisito de los navegadores)
+  ['pointerdown', 'keydown', 'touchstart'].forEach(ev => document.addEventListener(ev, unlockAudio, { passive: true }));
+
+  $('#btnDrink').addEventListener('click', drink);
+  $('#btnDone').addEventListener('click', () => { hideAlarm(); drink(); });
+  $('#btnSnooze').addEventListener('click', () => {
+    hideAlarm();
+    S.day.alarmPending = false;
+    S.day.nextAt = Date.now() + SNOOZE_MIN * MIN;
+    save();
+    renderTimer();
+    showToast('Vale, en 10 minutos. 🌿');
+  });
+
+  $('#btnCelClose').addEventListener('click', () => { clearTimeout(celTimer); $('#celebrate').classList.remove('show'); });
+  $('#microClose').addEventListener('click', hideMicro);
+
+  $('#btnReset').addEventListener('click', () => $('#confirm').classList.add('show'));
+  $('#confNo').addEventListener('click', () => $('#confirm').classList.remove('show'));
+  $('#confYes').addEventListener('click', () => { $('#confirm').classList.remove('show'); resetDay(); });
+
+  $('#btnSettings').addEventListener('click', openSettings);
+  $('#setClose').addEventListener('click', closeSettings);
+  $('#setCancel').addEventListener('click', closeSettings);
+  $('#setSave').addEventListener('click', saveSettings);
+  $('#sFreq').addEventListener('change', () => {
+    $('#sFreqCustomWrap').hidden = $('#sFreq').value !== 'custom';
+    updateFreqHint();
+  });
+  ['#sFreqCustom', '#sStart', '#sEnd', '#sGoal'].forEach(id => $(id).addEventListener('input', updateFreqHint));
+  $('#sSound').addEventListener('change', e => { if (e.target.checked) { unlockAudio(); const prev = cfg().sound; cfg().sound = true; playChime(); cfg().sound = prev; } });
+  $('#sNotif').addEventListener('change', async e => {
+    if (!e.target.checked) return;
+    const r = await requestNotif();
+    if (r !== 'granted') e.target.checked = false;
+    $('#sNotifHint').textContent = r === 'granted' ? 'Notificaciones activadas.' : notifHintText();
+  });
+
+  // Cerrar overlays con Escape o tocando fuera
+  document.addEventListener('keydown', e => {
+    if (e.key !== 'Escape') return;
+    hideMicro();
+    closeSettings();
+    $('#confirm').classList.remove('show');
+    $('#celebrate').classList.remove('show');
+  });
+  ['#settings', '#confirm'].forEach(id => $(id).addEventListener('click', e => { if (e.target === $(id)) $(id).classList.remove('show'); }));
+
+  // Al volver a la pestaña: recalcular de inmediato
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) {
+      clearInterval(titleBlink); titleBlink = null; document.title = baseTitle;
+      tick();
+    }
+  });
+  window.addEventListener('focus', tick);
+  window.addEventListener('pageshow', tick);
+
+  // Sincronizar si la app está abierta en otra pestaña
+  window.addEventListener('storage', e => {
+    if (e.key !== KEY) return;
+    S = load();
+    if (cfg().onboarded && S.day) { timerMode = ''; renderAll(); }
+  });
+}
+
+bindEvents();
+if (cfg().onboarded) startApp(); else startOnboarding();
+requestAnimationFrame(frame);
+
+})();
+</script>
+</body>
+</html>
