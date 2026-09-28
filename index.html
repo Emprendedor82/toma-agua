@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -194,6 +195,15 @@ select.input{
   margin:10px 0 4px;
 }
 .glass-svg{height:100%;width:auto;max-width:100%;overflow:visible}
+/* Escala de medición de la botella */
+.scale-tick{stroke:rgba(13,28,156,.22);stroke-width:1.2;stroke-linecap:round;transition:stroke .6s ease}
+.scale-tick.major{stroke:rgba(13,28,156,.38);stroke-width:1.5}
+.scale-label{
+  font-family:var(--ls);font-size:12.5px;font-weight:500;letter-spacing:.01em;
+  fill:var(--muted);opacity:.8;transition:fill .6s ease, opacity .6s ease;
+}
+.scale-label.near{fill:var(--deep);opacity:1}
+.scale-tick.major.near{stroke:rgba(13,28,156,.7)}
 .toast{
   position:absolute;top:4%;left:50%;
   transform:translate(-50%,10px);
@@ -567,18 +577,24 @@ select.input{
     <button class="icon-btn" id="btnSettings" aria-label="Configuración">⚙️</button>
   </header>
 
-  <!-- El protagonista: el vaso -->
-  <section class="stage" aria-label="Vaso de agua">
+  <!-- El protagonista: la botella de agua con escala de medición -->
+  <section class="stage" aria-label="Botella de agua">
     <svg class="glass-svg" id="glass" viewBox="0 0 240 340" role="img" aria-labelledby="glassLabel">
-      <title id="glassLabel">Agua restante en el vaso</title>
+      <title id="glassLabel">Agua restante en la botella</title>
       <defs>
+        <!-- Interior de la botella. Cuerpo cilíndrico recto: el volumen es proporcional a la altura -->
         <clipPath id="glassClip">
-          <path d="M33 22 L207 22 L190.5 290 Q189.5 303 176 303 L64 303 Q50.5 303 49.5 290 Z"/>
+          <path d="M127 55 C127 71 83 72 83 96 L83 306 Q83 313 90 313 L186 313 Q193 313 193 306 L193 96 C193 72 149 71 149 55 Z"/>
         </clipPath>
         <linearGradient id="glassBody" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0" stop-color="#0D88CD" stop-opacity=".07"/>
-          <stop offset=".45" stop-color="#FFFFFF" stop-opacity=".55"/>
-          <stop offset="1" stop-color="#0D88CD" stop-opacity=".09"/>
+          <stop offset="0" stop-color="#0D88CD" stop-opacity=".08"/>
+          <stop offset=".4" stop-color="#FFFFFF" stop-opacity=".6"/>
+          <stop offset="1" stop-color="#0D88CD" stop-opacity=".1"/>
+        </linearGradient>
+        <linearGradient id="capGrad" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stop-color="#DCE4F4"/>
+          <stop offset=".45" stop-color="#F7F9FE"/>
+          <stop offset="1" stop-color="#C9D4EC"/>
         </linearGradient>
         <linearGradient id="waterFront" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0" stop-color="#5EC6F4" stop-opacity=".9"/>
@@ -596,10 +612,10 @@ select.input{
       </defs>
 
       <!-- Sombra -->
-      <ellipse cx="120" cy="324" rx="96" ry="9" fill="url(#shadowGrad)"/>
+      <ellipse cx="138" cy="328" rx="74" ry="8" fill="url(#shadowGrad)"/>
 
-      <!-- Cuerpo del vaso -->
-      <path d="M24 14 L216 14 L196.5 300 Q194.5 320 175 320 L65 320 Q45.5 320 43.5 300 Z"
+      <!-- Cuerpo de la botella -->
+      <path d="M123 50 C123 67 78 68 78 94 L78 306 Q78 320 92 320 L184 320 Q198 320 198 306 L198 94 C198 68 153 67 153 50 Z"
             fill="url(#glassBody)" stroke="rgba(13,28,156,.16)" stroke-width="1.6" stroke-linejoin="round"/>
 
       <!-- Agua (recortada al interior) -->
@@ -612,20 +628,21 @@ select.input{
         </g>
       </g>
 
-      <!-- Marcas de nivel muy sutiles -->
-      <g stroke="rgba(13,28,156,.14)" stroke-width="1.2" stroke-linecap="round">
-        <line x1="200.3" y1="87" x2="191" y2="87"/>
-        <line x1="196.2" y1="154" x2="186.5" y2="154"/>
-        <line x1="192.1" y1="221" x2="182.5" y2="221"/>
-      </g>
+      <!-- Escala de medición (se genera según el objetivo diario) -->
+      <g id="scale"></g>
 
       <!-- Reflejos del cristal -->
-      <path d="M38 26 L50 26 L64 282 Q60 290 56 284 Z" fill="#fff" opacity=".42"/>
-      <path d="M200 30 L204 30 L190 270 L188 268 Z" fill="#fff" opacity=".35"/>
-      <!-- Borde superior -->
-      <ellipse cx="120" cy="14" rx="96" ry="3.2" fill="none" stroke="rgba(13,28,156,.18)" stroke-width="1.4"/>
-      <!-- Base gruesa -->
-      <path d="M50 304 Q52 316 66 316 L174 316 Q188 316 190 304" fill="none" stroke="rgba(255,255,255,.8)" stroke-width="2"/>
+      <rect x="89" y="100" width="7" height="196" rx="3.5" fill="#fff" opacity=".42"/>
+      <rect x="185" y="112" width="2.6" height="170" rx="1.3" fill="#fff" opacity=".35"/>
+      <path d="M131 58 C131 70 104 74 96 86" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".45"/>
+      <!-- Base -->
+      <path d="M84 312 Q86 316 94 316 L182 316 Q190 316 192 312" fill="none" stroke="rgba(255,255,255,.8)" stroke-width="2"/>
+
+      <!-- Cuello y tapón -->
+      <rect x="122" y="42" width="32" height="10" rx="2" fill="rgba(255,255,255,.55)" stroke="rgba(13,28,156,.16)" stroke-width="1.2"/>
+      <rect x="117" y="12" width="42" height="31" rx="8" fill="url(#capGrad)" stroke="rgba(13,28,156,.2)" stroke-width="1.3"/>
+      <line x1="121" y1="36" x2="155" y2="36" stroke="rgba(13,28,156,.12)" stroke-width="1"/>
+      <rect x="123" y="16" width="5" height="18" rx="2.5" fill="#fff" opacity=".8"/>
     </svg>
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
   </section>
@@ -1122,7 +1139,9 @@ function notifHintText() {
 /* -------------------------------------------------------------
    7. EL AGUA (animación SVG con requestAnimationFrame)
    ------------------------------------------------------------- */
-const TOP_Y = 40, BOTTOM_Y = 303;          // nivel lleno / vacío dentro del vaso
+const TOP_Y = 113, BOTTOM_Y = 313;         // marca del objetivo (lleno) / fondo (0) de la botella
+const LEVEL_MS = 900;                       // duración del descenso del agua
+let tweenFrom = 0, tweenTo = null, tweenStart = 0;
 let levelShown = 0, agitation = 0.35, phase = 0, lastFrame = 0;
 const bubbles = [];
 const elWaveBack = $('#waveBack'), elWaveFront = $('#waveFront'), elWaveLine = $('#waveLine');
@@ -1133,13 +1152,73 @@ const elWater = $('#waterGroup'), elBubbles = $('#bubbles');
     const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
     c.setAttribute('fill', 'rgba(255,255,255,.55)');
     elBubbles.appendChild(c);
-    bubbles.push({ el: c, x: 70 + Math.random() * 100, y: 300 - Math.random() * 200, r: 1 + Math.random() * 2.4, v: 10 + Math.random() * 18, w: Math.random() * 6 });
+    bubbles.push({ el: c, x: 95 + Math.random() * 86, y: 308 - Math.random() * 190, r: 1 + Math.random() * 2.4, v: 10 + Math.random() * 18, w: Math.random() * 6 });
   }
 })();
 
 function levelTarget() {
   if (!S.day) return 1;
   return cfg().goal > 0 ? remaining() / cfg().goal : 0;
+}
+
+/* Escala: 0 abajo, objetivo arriba. Rayas cada 250 ml (cada 500 ml si el objetivo supera 3 L).
+   La altura es lineal respecto a los ml, así que el agua coincide exactamente con las marcas. */
+const SVGNS = 'http://www.w3.org/2000/svg';
+const mlToY = (ml, goal) => BOTTOM_Y - (ml / goal) * (BOTTOM_Y - TOP_Y);
+function scaleLabel(ml) {
+  if (ml === 0) return '0';
+  if (ml < 1000) return `${ml} ml`;
+  return `${String(Math.round(ml / 100) / 10).replace('.', ',')} L`;
+}
+let scaleMarks = [], scaleGoal = null;
+function renderScale() {
+  const goal = cfg().goal;
+  if (goal === scaleGoal) return;
+  scaleGoal = goal;
+  const g = $('#scale');
+  g.innerHTML = '';
+  scaleMarks = [];
+  const minor = goal > 3000 ? 500 : 250, major = minor * 2;
+  const values = [];
+  for (let ml = 0; ml <= goal; ml += minor) values.push(ml);
+  if (values[values.length - 1] !== goal) values.push(goal);
+  values.forEach(ml => {
+    const y = mlToY(ml, goal);
+    const isTop = ml === goal;
+    const isMajor = ml % major === 0 || isTop;
+    // no etiquetar una marca demasiado pegada a la del objetivo
+    const tooClose = !isTop && (goal - ml) / goal * (BOTTOM_Y - TOP_Y) < 14;
+    const tick = document.createElementNS(SVGNS, 'line');
+    tick.setAttribute('x1', isMajor ? 60 : 65);
+    tick.setAttribute('x2', 72);
+    tick.setAttribute('y1', y); tick.setAttribute('y2', y);
+    tick.setAttribute('class', 'scale-tick' + (isMajor ? ' major' : ''));
+    g.appendChild(tick);
+    if (isMajor && !tooClose) {
+      const t = document.createElementNS(SVGNS, 'text');
+      t.setAttribute('x', 54); t.setAttribute('y', y);
+      t.setAttribute('text-anchor', 'end');
+      t.setAttribute('dominant-baseline', 'central');
+      t.setAttribute('class', 'scale-label');
+      t.textContent = scaleLabel(ml);
+      g.appendChild(t);
+      scaleMarks.push({ ml, tick, text: t, near: false });
+    }
+  });
+}
+// Destaca muy sutilmente la medida principal junto a la que está el agua
+function highlightScale(level) {
+  if (!scaleMarks.length || !S.day) return;
+  const goal = cfg().goal, ml = level * goal;
+  const tol = Math.max(40, goal * 0.03);
+  scaleMarks.forEach(m => {
+    const near = Math.abs(m.ml - ml) <= tol && !(m.ml === 0 && S.day.consumed === 0);
+    if (near !== m.near) {
+      m.near = near;
+      m.text.classList.toggle('near', near);
+      m.tick.classList.toggle('near', near);
+    }
+  });
 }
 
 function wavePath(y, amp, len, ph, closed) {
@@ -1155,10 +1234,14 @@ function frame(ts) {
   const dt = Math.min(0.05, (ts - (lastFrame || ts)) / 1000);
   lastFrame = ts;
 
-  // Nivel: aproximación suave al objetivo
+  // Nivel: transición suave (~900 ms) hasta el nuevo objetivo, sin saltos
   const target = levelTarget();
-  levelShown += (target - levelShown) * Math.min(1, dt * 1.9);
+  if (target !== tweenTo) { tweenFrom = levelShown; tweenTo = target; tweenStart = ts; }
+  const p = Math.min(1, (ts - tweenStart) / LEVEL_MS);
+  const e = p < .5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;   // easeInOutCubic
+  levelShown = tweenFrom + (tweenTo - tweenFrom) * e;
   const moving = Math.abs(target - levelShown);
+  highlightScale(levelShown);
 
   // Ondas: más vivas cuando el agua se mueve
   agitation = Math.max(0, agitation - dt * 0.35);
@@ -1175,7 +1258,7 @@ function frame(ts) {
   bubbles.forEach(b => {
     b.y -= b.v * dt;
     b.w += dt * 2;
-    if (b.y < y + 6) { b.y = 300; b.x = 70 + Math.random() * 100; }
+    if (b.y < y + 6) { b.y = 308; b.x = 95 + Math.random() * 86; }
     b.el.setAttribute('cx', (b.x + Math.sin(b.w) * 3).toFixed(1));
     b.el.setAttribute('cy', b.y.toFixed(1));
     b.el.setAttribute('r', b.r);
@@ -1294,6 +1377,7 @@ function renderMeta() {
 }
 
 function renderAll() {
+  renderScale();
   renderHeader(); renderStats(); renderTimer(); renderWeek(); renderMeta();
 }
 
